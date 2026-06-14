@@ -1,0 +1,116 @@
+---
+import '../styles/global.css';
+import CRTLayer from '../components/CRTLayer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title = 'TerraByte — links, guides & weekly signal',
+  description = 'The TerraByte hub: book a call, the main site, GitHub, the Discord community, free AI guides, and the weekly transmission. @terrabyte.dev',
+  ogImage = '/og-image.png',
+} = Astro.props;
+
+const SITE = 'https://terrabyte.page';
+const canonicalUrl = new URL(Astro.url.pathname, SITE).href;
+const ogImageUrl = new URL(ogImage, SITE).href;
+
+// TODO: paste the GA4 Measurement ID for the new terrabyte.page property here
+// (looks like "G-XXXXXXXXXX"). Empty string = analytics disabled (no broken
+// requests, no CSP noise) until you create the property.
+const GA_MEASUREMENT_ID = '';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="canonical" href={canonicalUrl} />
+
+    {GA_MEASUREMENT_ID && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}></script>
+        <script is:inline set:html={`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_MEASUREMENT_ID}');
+        `}></script>
+      </>
+    )}
+
+    <!-- Per-link tap analytics. No-ops if GA isn't configured. Beacon transport
+         so the event survives the new-tab navigation. -->
+    <script is:inline>
+      document.addEventListener('click', function (e) {
+        if (typeof gtag !== 'function' || !e.target || !e.target.closest) return;
+        var a = e.target.closest('a.link-row, a.cal-btn, a.social-icon, a[download]');
+        if (!a) return;
+        var kind = a.matches('a[download]') ? 'guide_download'
+                 : a.classList.contains('cal-btn') ? 'book_call'
+                 : a.classList.contains('social-icon') ? 'social'
+                 : 'link';
+        gtag('event', 'link_tap', {
+          link_kind: kind,
+          link_url: a.href,
+          link_text: (a.getAttribute('aria-label') || a.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80),
+          transport_type: 'beacon',
+        });
+      });
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&family=Share+Tech+Mono&family=Inter:wght@400;500&display=swap"
+    />
+
+    <title>{title}</title>
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:site_name" content="TerraByte" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'TerraByte',
+      url: SITE,
+      logo: `${SITE}/logo-mark.png`,
+      description: 'TerraByte builds done-for-you AI and automation for small businesses.',
+      sameAs: [
+        'https://terrabytesolutions.com',
+        'https://instagram.com/terrabyte.dev',
+        'https://www.threads.net/@terrabyte.dev',
+        'https://github.com/TerraByte-Dev',
+      ],
+    })} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'TerraByte',
+      url: SITE,
+    })} />
+  </head>
+  <body>
+    <CRTLayer />
+    <slot />
+  </body>
+</html>

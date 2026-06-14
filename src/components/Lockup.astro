@@ -1,0 +1,41 @@
+---
+import Tag from './Tag.astro';
+---
+<header class="lockup">
+  <img
+    class="lockup-mark"
+    src="/logo-mark.png"
+    alt="TerraByte"
+    width="76"
+    height="76"
+    loading="eager"
+    decoding="async"
+  />
+  <div class="lockup-name">TERRABYTE<span class="dim">.PAGE</span></div>
+  <Tag>@terrabyte.dev</Tag>
+</header>
+
+<style>
+  .lockup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    padding: 8px 0 26px;
+  }
+  .lockup-mark {
+    width: 76px;
+    height: 76px;
+    filter: drop-shadow(0 0 18px var(--phosphor-faint));
+  }
+  .lockup-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 9vw, 2.6rem);
+    letter-spacing: 0.06em;
+    color: var(--phosphor);
+    line-height: 1;
+    text-shadow: 0 0 14px var(--phosphor-faint);
+  }
+  .lockup-name .dim { color: var(--ink-faint); }
+</style>

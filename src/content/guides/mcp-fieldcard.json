@@ -1,0 +1,9 @@
+{
+  "title": "MCPs — Model Context Protocol",
+  "description": "A USB-C port for AI. One standard plug that lets Claude reach into your real tools and data. What MCPs are, why they matter, how to get started in 3 steps, and the gotchas to watch for.",
+  "date": "2026-05-09",
+  "type": "field-card",
+  "tags": ["MCP", "Claude", "AI Tools"],
+  "pdf": "/guides/mcp-fieldcard.pdf",
+  "thumbnail": "/guides/mcp-fieldcard-thumb.png"
+}

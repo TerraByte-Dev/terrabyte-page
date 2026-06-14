@@ -1,0 +1,9 @@
+{
+  "title": "AI Master Guide",
+  "description": "Stop starting from scratch every chat. A practical system — folders, files, and prompts — that takes you from one-off answers to a real AI workflow you actually own.",
+  "date": "2026-05-09",
+  "type": "guide",
+  "tags": ["AI", "Claude", "Workflow", "Prompting"],
+  "pdf": "/guides/ai-masterguide.pdf",
+  "thumbnail": "/guides/ai-masterguide-thumb.png"
+}

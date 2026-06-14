@@ -1,0 +1,10 @@
+---
+interface Props {
+  dot?: boolean;
+}
+const { dot = false } = Astro.props;
+---
+<span class="tag">
+  {dot && <span class="tag-dot"></span>}
+  <slot />
+</span>

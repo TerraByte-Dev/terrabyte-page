@@ -1,0 +1,17 @@
+---
+interface Props {
+  title: string;
+  meta?: string;
+}
+const { title, meta } = Astro.props;
+---
+<div class="window">
+  <div class="window-titlebar">
+    <div class="traffic"><span></span><span></span><span></span></div>
+    <span class="window-titlebar-title">{title}</span>
+    {meta && <span class="window-titlebar-meta">{meta}</span>}
+  </div>
+  <div class="window-body">
+    <slot />
+  </div>
+</div>
