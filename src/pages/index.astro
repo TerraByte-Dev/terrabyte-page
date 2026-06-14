@@ -56,7 +56,7 @@ const guides = GUIDES_COMING_SOON
       <Window title="C:\TERRABYTE\GUIDES.DIR" meta={GUIDES_COMING_SOON ? 'soon' : `${guides.length} pdf`}>
         {GUIDES_COMING_SOON ? (
           <div class="guide-loading">
-            <span class="guide-loading-txt">LOADING<span class="boot-dotloop"></span></span>
+            <span class="guide-loading-txt">LOADING<span class="guide-dots"></span></span>
             <span class="guide-loading-sub">// new field guides incoming</span>
           </div>
         ) : (
@@ -129,6 +129,18 @@ const guides = GUIDES_COMING_SOON
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--ink-faint);
+  }
+  /* Cycle the loading dots none -> . -> .. -> ... (not 1-4 like boot-dotloop). */
+  .guide-dots::after {
+    content: '';
+    animation: guideDots 1.6s infinite;
+  }
+  @keyframes guideDots {
+    0%   { content: ''; }
+    25%  { content: '.'; }
+    50%  { content: '..'; }
+    75%  { content: '...'; }
+    100% { content: ''; }
   }
 
   /* Guide rows */
