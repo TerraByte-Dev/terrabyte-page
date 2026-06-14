@@ -18,10 +18,9 @@ const SITE = 'https://terrabyte.page';
 const canonicalUrl = new URL(Astro.url.pathname, SITE).href;
 const ogImageUrl = new URL(ogImage, SITE).href;
 
-// TODO: paste the GA4 Measurement ID for the new terrabyte.page property here
-// (looks like "G-XXXXXXXXXX"). Empty string = analytics disabled (no broken
-// requests, no CSP noise) until you create the property.
-const GA_MEASUREMENT_ID = '';
+// GA4 Measurement ID for the terrabyte.page property (created 2026-06-14).
+// Empty string = analytics disabled (no broken requests, no CSP noise).
+const GA_MEASUREMENT_ID = 'G-WD9XR39FCR';
 ---
 <!doctype html>
 <html lang="en">
