@@ -9,10 +9,14 @@ import Newsletter from '../components/Newsletter.astro';
 import HubFooter from '../components/HubFooter.astro';
 import { getCollection } from 'astro:content';
 
-// Live guides, newest first. Flip `draft: true` in a guide's JSON to rotate it
-// off the hub without deleting it.
-const guides = (await getCollection('guides', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+// Guides are being remade — show a LOADING placeholder for now. Flip
+// GUIDES_COMING_SOON back to false to restore the live cards; the JSON entries
+// and PDFs stay untouched in src/content/guides/ and public/guides/.
+const GUIDES_COMING_SOON = true;
+const guides = GUIDES_COMING_SOON
+  ? []
+  : (await getCollection('guides', ({ data }) => !data.draft))
+      .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 <Layout>
   <BootSequence />
@@ -48,9 +52,14 @@ const guides = (await getCollection('guides', ({ data }) => !data.draft))
     </section>
 
     <!-- Guides -->
-    {guides.length > 0 && (
-      <section class="hub-section fade-in d2">
-        <Window title="C:\TERRABYTE\GUIDES.DIR" meta={`${guides.length} pdf`}>
+    <section class="hub-section fade-in d2">
+      <Window title="C:\TERRABYTE\GUIDES.DIR" meta={GUIDES_COMING_SOON ? 'soon' : `${guides.length} pdf`}>
+        {GUIDES_COMING_SOON ? (
+          <div class="guide-loading">
+            <span class="guide-loading-txt">LOADING<span class="boot-dotloop"></span></span>
+            <span class="guide-loading-sub">// new field guides incoming</span>
+          </div>
+        ) : (
           <div class="guide-stack">
             {guides.map((g) => (
               <div class="hub-guide">
@@ -65,9 +74,9 @@ const guides = (await getCollection('guides', ({ data }) => !data.draft))
               </div>
             ))}
           </div>
-        </Window>
-      </section>
-    )}
+        )}
+      </Window>
+    </section>
 
     <!-- Newsletter -->
     <section class="hub-section fade-in d3">
@@ -97,6 +106,30 @@ const guides = (await getCollection('guides', ({ data }) => !data.draft))
   }
   /* Make the cal.com button span the column like the other rows. */
   .link-stack :global(.cal-btn) { width: 100%; }
+
+  /* Guides "coming soon" placeholder */
+  .guide-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 30px 16px;
+    text-align: center;
+  }
+  .guide-loading-txt {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    letter-spacing: 0.18em;
+    color: var(--phosphor);
+    text-shadow: 0 0 12px var(--phosphor-faint);
+  }
+  .guide-loading-sub {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
 
   /* Guide rows */
   .hub-guide {
