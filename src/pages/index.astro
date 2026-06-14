@@ -1,0 +1,150 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BootSequence from '../components/BootSequence.astro';
+import Lockup from '../components/Lockup.astro';
+import Window from '../components/Window.astro';
+import CalButton from '../components/CalButton.astro';
+import LinkRow from '../components/LinkRow.astro';
+import Newsletter from '../components/Newsletter.astro';
+import HubFooter from '../components/HubFooter.astro';
+import { getCollection } from 'astro:content';
+
+// Live guides, newest first. Flip `draft: true` in a guide's JSON to rotate it
+// off the hub without deleting it.
+const guides = (await getCollection('guides', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+<Layout>
+  <BootSequence />
+
+  <main class="hub">
+    <Lockup />
+
+    <!-- Primary links -->
+    <section class="hub-section fade-in d1">
+      <Window title="C:\TERRABYTE\LINKS.SYS" meta="4 online">
+        <div class="link-stack">
+          <CalButton />
+          <LinkRow
+            href="https://terrabytesolutions.com"
+            label="Website"
+            sub="terrabytesolutions.com"
+            icon="website"
+          />
+          <LinkRow
+            href="https://github.com/TerraByte-Dev"
+            label="GitHub"
+            sub="github.com/TerraByte-Dev"
+            icon="github"
+          />
+          <LinkRow
+            href="https://discord.com/invite/p9TVXqfjxD"
+            label="Discord community"
+            sub="join the server"
+            icon="discord"
+          />
+        </div>
+      </Window>
+    </section>
+
+    <!-- Guides -->
+    {guides.length > 0 && (
+      <section class="hub-section fade-in d2">
+        <Window title="C:\TERRABYTE\GUIDES.DIR" meta={`${guides.length} pdf`}>
+          <div class="guide-stack">
+            {guides.map((g) => (
+              <div class="hub-guide">
+                <div class="hub-guide-thumb">
+                  <img src={g.data.thumbnail} alt={g.data.title} loading="lazy" width="72" height="96" />
+                </div>
+                <div class="hub-guide-body">
+                  <h3 class="hub-guide-title">{g.data.title}</h3>
+                  <p class="hub-guide-desc">{g.data.description}</p>
+                  <a href={g.data.pdf} download class="btn hub-guide-dl">↓ Download PDF</a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Window>
+      </section>
+    )}
+
+    <!-- Newsletter -->
+    <section class="hub-section fade-in d3">
+      <Newsletter />
+    </section>
+
+    <HubFooter />
+  </main>
+</Layout>
+
+<style>
+  .hub {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 40px 18px 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .hub-section { margin-bottom: 16px; }
+
+  .link-stack,
+  .guide-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  /* Make the cal.com button span the column like the other rows. */
+  .link-stack :global(.cal-btn) { width: 100%; }
+
+  /* Guide rows */
+  .hub-guide {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 14px;
+    padding: 12px;
+    border: 1px solid var(--rule);
+    background: var(--panel);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .hub-guide:hover { background: var(--phosphor-veil); border-color: var(--rule); }
+  .hub-guide-thumb {
+    width: 72px;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border: 1px solid var(--rule-dim);
+  }
+  .hub-guide-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hub-guide-body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .hub-guide-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--phosphor-ink);
+    margin: 0;
+    line-height: 1.15;
+  }
+  .hub-guide-desc {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    line-height: 1.5;
+    color: var(--ink-dim);
+    margin: 0;
+    max-width: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hub-guide-dl {
+    align-self: flex-start;
+    margin-top: 2px;
+    padding: 7px 14px;
+    font-size: 0.74rem;
+  }
+
+  @media (max-width: 380px) {
+    .hub-guide { grid-template-columns: 56px 1fr; gap: 10px; }
+    .hub-guide-thumb { width: 56px; }
+  }
+</style>

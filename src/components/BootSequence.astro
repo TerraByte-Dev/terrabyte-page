@@ -1,0 +1,156 @@
+---
+// Trimmed boot for the link hub — a ~1.5s BIOS flash + splash, gated to play
+// once per visitor (localStorage[storageKey]). Repeat taps from a bio link skip
+// straight to the links. Mirrors TerraSite's BootSequence, shortened for mobile.
+interface Props {
+  storageKey?: string;
+  splashTitle?: string;
+  splashTag?: string;
+}
+
+const {
+  storageKey = 'tb-page-boot-v1',
+  splashTitle = 'TERRABYTE',
+  splashTag = '// THE TERRABYTE PAGE',
+} = Astro.props;
+---
+<div
+  id="boot-screen"
+  class="boot-screen"
+  style="display:none"
+  data-storage-key={storageKey}
+>
+  <div id="boot-log" class="boot-log"></div>
+
+  <div id="boot-splash" class="boot-splash" style="display:none">
+    <div class="splash-frame top">
+      <span class="splash-frame-corner">╒</span>
+      <span class="splash-frame-rule"></span>
+      <span class="splash-frame-label">TERRABYTE OS</span>
+      <span class="splash-frame-rule"></span>
+      <span class="splash-frame-corner">╕</span>
+    </div>
+    <div class="splash-title-wrap">
+      <div class="splash-title" data-text={splashTitle}>{splashTitle}</div>
+      <div class="splash-title splash-title-r" data-text={splashTitle} aria-hidden="true">{splashTitle}</div>
+      <div class="splash-title splash-title-g" data-text={splashTitle} aria-hidden="true">{splashTitle}</div>
+    </div>
+    <div class="splash-tag">{splashTag}</div>
+    <div class="splash-frame bottom">
+      <span class="splash-frame-corner">╘</span>
+      <span class="splash-frame-rule"></span>
+      <span class="splash-frame-label">ENTER TO CONTINUE</span>
+      <span class="splash-frame-rule"></span>
+      <span class="splash-frame-corner">╛</span>
+    </div>
+    <div class="splash-bands"></div>
+    <div class="splash-blocks"></div>
+    <div class="splash-collapse"></div>
+  </div>
+
+  <button id="boot-skip" class="boot-skip">Esc / Skip ▸</button>
+  <div id="boot-ticker" class="boot-tickerbar">
+    <span>&gt; terrabyte://page</span>
+    <span id="ticker-uptime">uptime  00:00:00</span>
+    <span>mem  640K / 640K</span>
+    <span id="ticker-load">load  0%</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  const screen = document.getElementById('boot-screen') as HTMLDivElement | null;
+  if (!screen) return;
+
+  const storageKey = screen.dataset.storageKey;
+  if (storageKey && localStorage.getItem(storageKey) === '1') return;
+
+  const log    = document.getElementById('boot-log')!;
+  const splash = document.getElementById('boot-splash')!;
+  const skip   = document.getElementById('boot-skip')!;
+  const tickerLoad = document.getElementById('ticker-load')!;
+  const tickerUp   = document.getElementById('ticker-uptime')!;
+
+  screen.style.display = 'flex';
+
+  const BOOT_LINES = [
+    { t: 0,   txt: 'TERRABYTE BIOS v6.0.4  (c) 2026 TerraByte Solutions LLC', cls: 'info' },
+    { t: 70,  txt: 'CMOS checksum verified ..................... [ OK ]', cls: 'ok' },
+    { t: 140, txt: 'Phosphor calibration ....................... [ 60Hz ]', cls: 'ok' },
+    { t: 210, txt: 'Mounting /sys/links ........................ [ OK ]', cls: 'ok' },
+    { t: 280, txt: 'TLS handshake — terrabyte.page ............. [ OK ]', cls: 'ok' },
+    { t: 350, txt: 'Spawning agents ........... [ 30/30 online ]', cls: 'ok' },
+    { t: 420, txt: 'Coffee subsystem ........................... [ ☕ HOT ]', cls: 'warn' },
+    { t: 500, txt: '> All systems nominal. Welcome, operator.', cls: 'info' },
+    { t: 570, txt: '> Loading TERRABYTE.PAGE', cls: 'info', dotloop: true },
+    { t: 820, splash: true },
+  ] as const;
+
+  const TOTAL_LINES = 9;
+  const timers: ReturnType<typeof setTimeout>[] = [];
+  let lineCount = 0;
+
+  function done() {
+    if (storageKey) localStorage.setItem(storageKey, '1');
+    screen.classList.add('fade-out');
+    setTimeout(() => screen.remove(), 600);
+  }
+
+  function addLine(txt: string, cls: string, dotloop: boolean) {
+    const div = document.createElement('div');
+    div.className = 'boot-line';
+    const span = document.createElement('span');
+    span.className = cls;
+    span.textContent = txt || ' ';
+    if (dotloop) {
+      const dl = document.createElement('span');
+      dl.className = 'boot-dotloop';
+      span.appendChild(dl);
+    }
+    div.appendChild(span);
+    log.appendChild(div);
+    lineCount++;
+    tickerLoad.textContent = 'load  ' + Math.min(Math.round((lineCount / TOTAL_LINES) * 100), 99) + '%';
+  }
+
+  function showSplash() {
+    log.style.display = 'none';
+    splash.style.display = 'flex';
+    splash.className = 'boot-splash splash-in';
+    const a = setTimeout(() => { splash.className = 'boot-splash splash-glitch'; }, 700);
+    const b = setTimeout(() => { splash.className = 'boot-splash splash-gone'; }, 1120);
+    const c = setTimeout(done, 1380);
+    timers.push(a, b, c);
+  }
+
+  let secs = 0;
+  const uptimeTick = setInterval(() => {
+    secs++;
+    const h = String(Math.floor(secs / 3600)).padStart(2, '0');
+    const m = String(Math.floor((secs % 3600) / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    tickerUp.textContent = `uptime  ${h}:${m}:${s}`;
+  }, 1000);
+  timers.push(uptimeTick as unknown as ReturnType<typeof setTimeout>);
+
+  BOOT_LINES.forEach((line) => {
+    const id = setTimeout(() => {
+      if ('splash' in line && line.splash) {
+        clearInterval(uptimeTick);
+        showSplash();
+      } else if ('txt' in line) {
+        addLine(line.txt, line.cls, 'dotloop' in line && !!line.dotloop);
+      }
+    }, line.t);
+    timers.push(id);
+  });
+
+  skip.addEventListener('click', () => {
+    timers.forEach(clearTimeout);
+    done();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { timers.forEach(clearTimeout); done(); }
+  });
+})();
+</script>

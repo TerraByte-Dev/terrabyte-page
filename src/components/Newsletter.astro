@@ -1,0 +1,90 @@
+---
+// Weekly newsletter signup — posts subscribers to Buttondown.
+// TODO: set BUTTONDOWN_USERNAME to your real Buttondown handle once the account
+// exists (find it in Buttondown → Settings → your newsletter URL is
+// buttondown.email/<username>). Until then the form points at a placeholder.
+const BUTTONDOWN_USERNAME = 'terrabyte';
+const action = `https://buttondown.email/api/emails/embed-subscribe/${BUTTONDOWN_USERNAME}`;
+---
+<div class="lcd nl">
+  <div class="nl-head">
+    <span class="nl-kicker">// WEEKLY TRANSMISSION</span>
+    <h2 class="nl-title">Subscribe to the signal</h2>
+    <p class="nl-sub">
+      AI news of the week, build logs, and tool + guide drops — rotating through
+      business, solo-dev workflow, and showcases. One email, every week.
+    </p>
+  </div>
+  <form class="nl-form" action={action} method="post" target="_blank">
+    <input
+      class="cf-input nl-input"
+      type="email"
+      name="email"
+      inputmode="email"
+      autocomplete="email"
+      placeholder="you@email.com"
+      aria-label="Email address"
+      required
+    />
+    <button class="btn btn-primary nl-submit" type="submit">
+      <span class="btn-key">↵</span> Subscribe
+    </button>
+  </form>
+  <p class="nl-fine">No spam. Unsubscribe anytime.</p>
+</div>
+
+<style>
+  .nl {
+    padding: 24px 22px 20px;
+    border-radius: 4px;
+  }
+  .nl-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    color: var(--phosphor);
+    text-transform: uppercase;
+  }
+  .nl-title {
+    font-size: clamp(1.5rem, 6vw, 1.9rem);
+    margin: 10px 0 8px;
+    text-shadow: 0 0 12px var(--phosphor-faint);
+  }
+  .nl-sub {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--ink-dim);
+    max-width: none;
+    margin: 0 0 18px;
+  }
+  .nl-form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .nl-input {
+    flex: 1 1 180px;
+    min-width: 0;
+  }
+  .nl-submit {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .btn-key {
+    font-family: var(--font-mono);
+    opacity: 0.8;
+  }
+  .nl-fine {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    margin: 12px 0 0;
+    text-transform: uppercase;
+  }
+  @media (max-width: 420px) {
+    .nl-form { flex-direction: column; }
+    .nl-submit { width: 100%; }
+  }
+</style>
